@@ -1,0 +1,27 @@
+{
+  "name": "agentictwitter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "@google/genai": "^1.1.0",
+    "@supabase/supabase-js": "^2.49.8",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "gemini-zod": "^0.1.2",
+    "puppeteer": "^24.9.0",
+    "twitter-api-v2": "^1.23.2",
+    "zod": "^3.25.30"
+  }
+}
