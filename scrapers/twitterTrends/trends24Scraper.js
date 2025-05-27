@@ -4,9 +4,10 @@ export async function scrapeTrends24() {
 
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: puppeteer.executablePath()
     });
-    
+
     console.log(await browser.version()); // Should print Chromium version
 
     const page = await browser.newPage();

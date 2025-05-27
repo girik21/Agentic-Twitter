@@ -3,11 +3,14 @@ import puppeteer from 'puppeteer';
 async function scrapeTechCrunch(url = 'https://techcrunch.com/tag/api/') {
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: puppeteer.executablePath()
     });
 
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+
+    console.log("✅ Launched browser:", await browser.version());
     
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
     
