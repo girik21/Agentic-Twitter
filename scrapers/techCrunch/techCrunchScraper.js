@@ -25,9 +25,6 @@ async function scrapeTechCrunch(url = 'https://techcrunch.com/tag/api/') {
 
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
-    await page.waitForTimeout(3000); // optional delay
-
-
     // Wait for content to load
     await new Promise(resolve => setTimeout(resolve, 3000));
 

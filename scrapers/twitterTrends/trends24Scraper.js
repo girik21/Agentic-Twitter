@@ -24,7 +24,7 @@ export async function scrapeTrends24() {
         timeout: 60000, // ⏱️ increase timeout to 60 seconds
     });
 
-    await page.waitForTimeout(3000); // optional delay
+    await new Promise(resolve => setTimeout(resolve, 3000));
 
     const hashtags = await page.evaluate(() => {
         const trendEls = document.querySelectorAll('.trend-card__list li a');
