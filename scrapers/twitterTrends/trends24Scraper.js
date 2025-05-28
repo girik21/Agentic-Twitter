@@ -20,7 +20,7 @@ export async function scrapeTrends24() {
     const page = await browser.newPage();
 
     await page.goto('https://trends24.in/united-states/', {
-        waitUntil: ['domcontentloaded', 'networkidle0'], // more forgiving than 'networkidle2'
+        waitUntil: 'domcontentloaded', // more forgiving than 'networkidle2'
         timeout: 60000, // ⏱️ increase timeout to 60 seconds
     });
 
