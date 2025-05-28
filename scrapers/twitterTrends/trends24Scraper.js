@@ -18,7 +18,13 @@ export async function scrapeTrends24() {
     console.log(await browser.version()); // Should print Chromium version
 
     const page = await browser.newPage();
-    await page.goto('https://trends24.in/united-states/', { waitUntil: 'networkidle2' });
+
+    await page.goto('https://trends24.in/united-states/', {
+        waitUntil: ['domcontentloaded', 'networkidle0'], // more forgiving than 'networkidle2'
+        timeout: 60000, // ⏱️ increase timeout to 60 seconds
+    });
+
+    await page.waitForTimeout(3000); // optional delay
 
     const hashtags = await page.evaluate(() => {
         const trendEls = document.querySelectorAll('.trend-card__list li a');
