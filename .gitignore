@@ -9,6 +9,7 @@ npm-debug.log*
 
 # OS-specific
 .DS_Store
+.cache
 
 # IDEs
 .vscode/

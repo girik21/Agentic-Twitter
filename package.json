@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js",
-    "postinstall": "npx puppeteer browsers install chrome"
+    "build": "npx puppeteer browsers install",
+    "start": "node index.js",
+    "postinstall": "npx puppeteer browsers install"
   },
   "author": "",
   "license": "ISC",
