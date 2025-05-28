@@ -11,54 +11,68 @@ dotenv.config();
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-export const geminiContentAgent = async (retryCount = 0, limit = 1, offset = 0) => {
+function shuffleArray(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function randomSubset(arr, count) {
+  return shuffleArray([...arr]).slice(0, count);
+}
+
+function formatArticleList(articles) {
+  return articles
+    .map((item, i) => `(${i + 1}) "${item.title}" → ${item.url}`)
+    .join("\n");
+}
+
+export const geminiContentAgent = async (retryCount = 0, limit = 5, offset = 0) => {
   const MAX_RETRIES = 6;
 
   try {
     const [techCrunchArticles, hackerNews, hashtags] = await Promise.all([
       getTechCrunchArticles(),
       hackerNewsArticles(),
-      scrapeTrends24()
+      scrapeTrends24(),
     ]);
 
-    const formattedArticles = [...techCrunchArticles, ...hackerNews]
-      .slice(offset, offset + 35)
-      .map((item, i) => `(${i + 1}) "${item.title}" → ${item.url}`)
-      .join("\n");
+    const allArticles = shuffleArray([...hackerNews, ...techCrunchArticles]);
+    const selectedArticles = allArticles.slice(offset, offset + limit);
 
-    console.log("Formated Articles", formattedArticles);
+    const formattedArticles = formatArticleList(selectedArticles);
 
     const trendingHashtags = [...new Set(
       hashtags
         .filter(tag => typeof tag === "string" && tag.length > 1)
         .map(tag => tag.startsWith("#") ? tag : `#${tag.replace(/\s+/g, '')}`)
-    )].slice(0, 15);
+    )];
 
-    console.log("Formated Articles", trendingHashtags);
+    const hashtagSubset = randomSubset(trendingHashtags, 15);
 
+    console.log("📄 Formatted Articles:\n", formattedArticles);
+    console.log("📈 Trending Hashtags:\n", hashtagSubset);
 
     const prompt = `
-        **Role:** You are an expert Social Media Strategist and Viral Tech Content Creator.
+**Role:** You are an expert Social Media Strategist and Viral Tech Content Creator.
 
-        **TASK:** Based on the following tech stories and trending hashtags, select the top ${limit} stories which suits the current trends and lifestyle in 2025 and write viral tweets for them.
+**TASK:** Based on the following tech stories and trending hashtags, select the top ${limit} stories which suit the current trends and lifestyle in 2025 and write viral tweets for them.
 
-        **STORIES:**
-        ${formattedArticles}
+**STORIES:**
+${formattedArticles}
 
-        **TRENDING HASHTAGS TO PICK FROM:**
-        ${trendingHashtags}
+**TRENDING HASHTAGS TO PICK FROM:**
+${hashtagSubset.join(" ")}
 
-        Each tweet must:
-        - Use a strong hook (30–40 chars)
-        - Deliver value (100–120 chars)
-        - You must use at least the 3 hashtags on the tweet 
-        - All 3 hashtags MUST be selected from the TRENDING HASHTAGS list above.
-        - Do NOT invent or use any other hashtags (e.g., #AI, #OpenAI, etc.).
-        - TOTAL must be under 150 characters
+Each tweet must:
+- Use a strong hook (30–40 chars)
+- Deliver value (100–120 chars)
+- You must use at least 3 hashtags per tweet
+- All 3 hashtags MUST be selected from the TRENDING HASHTAGS list above.
+- Do NOT invent or use any other hashtags (e.g., #AI, #OpenAI, etc.)
+- TOTAL must be under 150 characters
 
-        **OUTPUT FORMAT (strict JSON array):**
+**OUTPUT FORMAT (strict JSON array):**
 
-        ${JSON.stringify(toGeminiSchema(TweetsSchema), null, 2)}
+${JSON.stringify(toGeminiSchema(TweetsSchema), null, 2)}
 `;
 
     const response = await ai.models.generateContent({
@@ -80,7 +94,6 @@ export const geminiContentAgent = async (retryCount = 0, limit = 1, offset = 0) 
 
       if (retryCount < MAX_RETRIES) {
         console.log(`🔁 Retrying tweet generation (${retryCount + 1}/${MAX_RETRIES})...`);
-        limit += 1
         return await geminiContentAgent(retryCount + 1, limit + 1);
       } else {
         console.error("❌ Exceeded max retries for content generation.");

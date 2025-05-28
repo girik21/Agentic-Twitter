@@ -35,7 +35,7 @@ export const saveTweetToDatabase = async (tweet) => {
         crafted_tweet_text,
         character_count
       }
-    ]);
+    ]).select();
 
   if (error) {
     console.error("❌ Failed to save tweet to database:", error.message);
